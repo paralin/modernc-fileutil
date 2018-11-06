@@ -4,7 +4,7 @@
 
 // +build go1.3
 
-package fileutil
+package fileutil // import "modernc.org/fileutil"
 
 import (
 	"io"

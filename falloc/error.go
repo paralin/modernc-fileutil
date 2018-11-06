@@ -4,7 +4,7 @@
 
 // blame: jnml, labs.nic.cz
 
-package falloc
+package falloc // import "modernc.org/fileutil/falloc"
 
 import "fmt"
 

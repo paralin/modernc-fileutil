@@ -4,7 +4,7 @@
 
 // blame: jnml, labs.nic.cz
 
-package hdb
+package hdb // import "modernc.org/fileutil/hdb"
 
 import (
 	"testing"

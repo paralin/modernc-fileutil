@@ -12,11 +12,11 @@ The main incompletness is support for only one kind of FTL, though this table ki
 
 */
 
-package falloc
+package falloc // import "modernc.org/fileutil/falloc"
 
 import (
 	"bytes"
-	"github.com/cznic/fileutil/storage"
+	"modernc.org/fileutil/storage"
 	"sync"
 )
 

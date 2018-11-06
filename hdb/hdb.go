@@ -26,11 +26,11 @@ Conceptual analogy:
 
 	Delete	    free() the "memory" "pointed to" by handle.
 */
-package hdb
+package hdb // import "modernc.org/fileutil/hdb"
 
 import (
-	"github.com/cznic/fileutil/falloc"
-	"github.com/cznic/fileutil/storage"
+	"modernc.org/fileutil/falloc"
+	"modernc.org/fileutil/storage"
 )
 
 type Store struct {

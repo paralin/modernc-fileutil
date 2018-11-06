@@ -4,7 +4,7 @@
 
 // +build !arm
 
-package fileutil
+package fileutil // import "modernc.org/fileutil"
 
 import (
 	"bytes"

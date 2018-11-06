@@ -5,7 +5,7 @@
 // blame: jnml, labs.nic.cz
 
 // WIP: Package storage defines and implements storage providers and store accessors.
-package storage
+package storage // import "modernc.org/fileutil/storage"
 
 import (
 	"os"
