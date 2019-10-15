@@ -8,7 +8,9 @@ package storage // import "modernc.org/fileutil/storage"
 
 import (
 	"flag"
+	"os"
 	"runtime"
+	"testing"
 )
 
 var (
@@ -16,7 +18,8 @@ var (
 	goFlag  = flag.Int("go", 1, "GOMAXPROCS")
 )
 
-func init() {
+func TestMain(m *testing.M) {
 	flag.Parse()
 	runtime.GOMAXPROCS(*goFlag)
+	os.Exit(m.Run())
 }
