@@ -37,9 +37,10 @@ var (
 	optGo          = flag.Int("go", 3, "GOMAXPROCS")
 )
 
-func init() {
+func TestMain(m *testing.M) {
 	flag.Parse()
 	runtime.GOMAXPROCS(*optGo)
+	os.Exit(m.Run())
 }
 
 func temp() (dir, name string) {
