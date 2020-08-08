@@ -84,7 +84,7 @@ func (e *EHeader) Error() string {
 type ENullHandle string
 
 func (e ENullHandle) Error() string {
-	return fmt.Sprintf("%s: access via null handle", e)
+	return fmt.Sprintf("%s: access via null handle", string(e))
 }
 
 // EOpen is a file/store open error.
