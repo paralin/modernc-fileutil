@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build (arm || arm64) && !windows && !openbsd && !plan9
 // +build arm arm64
 // +build !windows
 // +build !openbsd
