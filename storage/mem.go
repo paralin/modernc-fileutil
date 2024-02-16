@@ -14,7 +14,7 @@ import (
 	"os"
 )
 
-//TODO -> exported type w/ exported fields
+// TODO -> exported type w/ exported fields
 type memaccessor struct {
 	f  *os.File
 	fi *FileInfo

@@ -114,7 +114,6 @@ func (c *Cache) EndUpdate() error { return nil }
 // NewCache returns the new Cache, implementing Accessor or an error if any.
 //
 // The LRU mechanism is used, so the cache tries to keep often accessed pages cached.
-//
 func NewCache(store Accessor, maxcache int64, advise func(int64, int, bool)) (c *Cache, err error) {
 	var fi os.FileInfo
 	if fi, err = store.Stat(); err != nil {

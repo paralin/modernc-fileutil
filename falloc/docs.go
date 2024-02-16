@@ -5,30 +5,31 @@
 // blame: jnml, labs.nic.cz
 
 /*
-
 WIP: Package falloc provides allocation/deallocation of space within a
 file/store (WIP, unstable API).
 
 Overall structure:
- File == n blocks.
- Block == n atoms.
- Atom == 16 bytes.
+
+	File == n blocks.
+	Block == n atoms.
+	Atom == 16 bytes.
 
 x6..x0 == least significant 7 bytes of a 64 bit integer, highest (7th) byte is
 0 and is not stored in the file.
 
-Block first byte
+# Block first byte
 
 Aka block type tag.
 
 ------------------------------------------------------------------------------
 
 0xFF: Free atom (free block of size 1).
- +------++---------++---------++------+
- |  0   ||  1...7  || 8...14  ||  15  |
- +------++---------++---------++------+
- | 0xFF || p6...p0 || n6...n0 || 0xFF |
- +------++---------++---------++------+
+
+	+------++---------++---------++------+
+	|  0   ||  1...7  || 8...14  ||  15  |
+	+------++---------++---------++------+
+	| 0xFF || p6...p0 || n6...n0 || 0xFF |
+	+------++---------++---------++------+
 
 Link to the previous free block (atom addressed) is p6...p0, next dtto in
 n6...n0.  Doubly linked lists of "compatible" free blocks allows for free space
@@ -38,11 +39,12 @@ such lists are organized per K or intervals of Ks elsewhere.
 ------------------------------------------------------------------------------
 
 0xFE: Free block, size == s6...s0 atoms.
- +------++---------++---------++---------++--
- |  +0  ||  1...7  || 8...14  || 15...21 || 22...16*size-1
- +------++---------++---------++---------++--
- | 0xFE || p6...p0 || n6...n0 || s6...s0 || ...
- +------++---------++---------++---------++--
+
+	+------++---------++---------++---------++--
+	|  +0  ||  1...7  || 8...14  || 15...21 || 22...16*size-1
+	+------++---------++---------++---------++--
+	| 0xFE || p6...p0 || n6...n0 || s6...s0 || ...
+	+------++---------++---------++---------++--
 
 Prev and next links as in the 0xFF first byte case.  End of this block - see
 "Block last byte": 0xFE bellow. Data between == undefined.
@@ -50,11 +52,12 @@ Prev and next links as in the 0xFF first byte case.  End of this block - see
 ------------------------------------------------------------------------------
 
 0xFD:  Relocated block.
- +------++---------++-----------++------+
- |  0   ||  1...7  ||  8...14   ||  15  |
- +------++---------++-----------++------+
- | 0xFD || r6...r0 || undefined || 0x00 | // == used block
- +------++---------++-----------++------+
+
+	+------++---------++-----------++------+
+	|  0   ||  1...7  ||  8...14   ||  15  |
+	+------++---------++-----------++------+
+	| 0xFD || r6...r0 || undefined || 0x00 | // == used block
+	+------++---------++-----------++------+
 
 Relocation link is r6..r0 == atom address. Relocations MUST NOT chain and MUST
 point to a "content" block, i.e. one with the first byte in 0x00...0xFC.
@@ -66,11 +69,12 @@ to update all the possible existing references to the original handle.
 ------------------------------------------------------------------------------
 
 0xFC: Used long block.
- +------++---------++--------------------++---------+---+
- |  0   ||  1...2  ||      3...N+2       ||         |   |
- +------++---------++--------------------++---------+---+
- | 0xFC || n1...n0 || N bytes of content || padding | Z |
- +------++---------++--------------------++---------+---+
+
+	+------++---------++--------------------++---------+---+
+	|  0   ||  1...2  ||      3...N+2       ||         |   |
+	+------++---------++--------------------++---------+---+
+	| 0xFC || n1...n0 || N bytes of content || padding | Z |
+	+------++---------++--------------------++---------+---+
 
 This block type is used for content of length in N == 238...61680 bytes. N is
 encoded as a 2 byte unsigned integer n1..n0 in network byte order. Values
@@ -85,11 +89,11 @@ bellow 238 are reserved, those content lengths are to be carried by the
 
  3. If the last byte of the content IS the last byte of an atom:
 
-   3.1 If the last byte of content is in 0x00..0xFD then everything is OK.
+    3.1 If the last byte of content is in 0x00..0xFD then everything is OK.
 
-   3.2 If the last byte of content is 0xFE or 0xFF then the escape
-       via n > 0xF0F0 MUST be used AND the block's last byte is 0x00 or 0x01,
-       meaning value 0xFE and 0xFF respectively.
+    3.2 If the last byte of content is 0xFE or 0xFF then the escape
+    via n > 0xF0F0 MUST be used AND the block's last byte is 0x00 or 0x01,
+    meaning value 0xFE and 0xFF respectively.
 
  4. n in 0xF0F1...0xFFFF is like the escaped 0xEE..0xFB block.
     N == 13 + 16(n - 0xF0F1).
@@ -99,11 +103,12 @@ Discussion of the padding and Z fields - see the 0x01..0xED block type.
 ------------------------------------------------------------------------------
 
 0xEE...0xFB: Used escaped short block.
- +---++----------------------++---+
- | 0 ||        1...N-1       ||   |
- +---++----------------------++---+
- | X || N-1 bytes of content || Z |
- +---++----------------------++---+
+
+	+---++----------------------++---+
+	| 0 ||        1...N-1       ||   |
+	+---++----------------------++---+
+	| X || N-1 bytes of content || Z |
+	+---++----------------------++---+
 
 N == 15 + 16(X - 0xEE). Z is the content last byte encoded as follows.
 
@@ -114,11 +119,12 @@ case Z == 0x01:	The last byte of content is 0xFF
 ------------------------------------------------------------------------------
 
 0x01...0xED: Used short block.
- +---++--------------------++---------+---+
- | 0 ||        1...N       ||         |   |
- +---++--------------------++---------+---+
- | N || N bytes of content || padding | Z |
- +---++--------------------++---------+---+
+
+	+---++--------------------++---------+---+
+	| 0 ||        1...N       ||         |   |
+	+---++--------------------++---------+---+
+	| N || N bytes of content || padding | Z |
+	+---++--------------------++---------+---+
 
 This block type is used for content of length in 1...237 bytes.  The value of
 the "padding" field, if of non zero length, is undefined.
@@ -137,18 +143,19 @@ be 0x00 (i.e. the used block marker).  Other "tail" values are reserved.
 ------------------------------------------------------------------------------
 
 0x00: Used empty block.
- +------++-----------++------+
- |  0   ||  1...14   ||  15  |
- +------++-----------++------+
- | 0x00 || undefined || 0x00 | // == used block, other "tail" values reserved.
- +------++-----------++------+
+
+	+------++-----------++------+
+	|  0   ||  1...14   ||  15  |
+	+------++-----------++------+
+	| 0x00 || undefined || 0x00 | // == used block, other "tail" values reserved.
+	+------++-----------++------+
 
 All of the rules for 0x01..0xED applies. Depicted only for its different
 semantics (e.g. an allocated [existing] string but with length of zero).
 
 ==============================================================================
 
-Block last byte
+# Block last byte
 
 ------------------------------------------------------------------------------
 
@@ -158,11 +165,12 @@ Block last byte
 
 0xFE: Free block, size n atoms. Preceding 7 bytes == size (s6...s0) of the free
 block in atoms, network byte order
-   --++---------++------+
-     || -8...-2 ||  -1  |
-   --++---------++------+
- ... || s6...s0 || 0xFE | <- block's last byte
-   --++---------++------+
+
+	  --++---------++------+
+	    || -8...-2 ||  -1  |
+	  --++---------++------+
+	... || s6...s0 || 0xFE | <- block's last byte
+	  --++---------++------+
 
 Layout at start of this block - see "Block first byte": FE.
 
@@ -172,7 +180,7 @@ Layout at start of this block - see "Block first byte": FE.
 
 ==============================================================================
 
-Free lists table
+# Free lists table
 
 The free lists table content is stored in the standard layout of a used block.
 
@@ -219,18 +227,18 @@ or they may be fine tuned to a specific usage pattern.
 
 ==============================================================================
 
-Header
+# Header
 
 The first block of a file (atom address == file offset == 0) is the file header.
 The header block has the standard layout of a used short non escaped block.
 
 Special conditions apply: The header block and its content MUST be like this:
 
- +------+---------+---------+------+
- |  0   |  1...7  | 8...14  |  15  |
- +------+---------+---------+------+
- | 0x0F | m6...m0 | f6...f0 | FLTT |
- +------+---------+---------+------+
+	+------+---------+---------+------+
+	|  0   |  1...7  | 8...14  |  15  |
+	+------+---------+---------+------+
+	| 0x0F | m6...m0 | f6...f0 | FLTT |
+	+------+---------+---------+------+
 
 m6..m0 is a "magic" value 0xF1C1A1FE51B1E.
 

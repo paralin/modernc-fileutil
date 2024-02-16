@@ -14,6 +14,7 @@ handles and the basic synchronizing primitives.  The central functionality of
 hdb are the New, Set, Get and Delete methods of Store.
 
 Conceptual analogy:
+
 	New	    alloc(sizeof(content)), return new "memory" pointer (a handle).
 
 	Get	    memmove() from "memory" "pointed to" by handle to the result content.
